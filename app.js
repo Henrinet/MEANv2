@@ -39,11 +39,13 @@ app.use(bodyParser.json());
 app.use(passport.initialize());
 app.use(passport.session());
 
+require('./config/passport')(passport);
+
 app.use('/users', users);
 
 // Index route
 app.get('/', (req, res) => {
-    res.send('Endpoint')
+    res.send('Here is Node js Backend!')
 });
 
 // Start server
