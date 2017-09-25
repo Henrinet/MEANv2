@@ -48,3 +48,4 @@ module.exports.comparePassword =  (candidatePassword, hash, callback) =>{
         callback(null, isMatch);
     });
 }
+

@@ -65,4 +65,12 @@ router.get('/profile', passport.authenticate('jwt', {session:false}), (req, res,
     res.json({user: req.user});
 });
 
+//allUsers
+router.get('/allusers', (req, res) => {
+    User.find((err, users)=>{
+        if(err){res.send(err)}
+        res.json(users);
+    });
+});
+
 module.exports = router;
