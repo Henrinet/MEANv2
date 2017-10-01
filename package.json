@@ -10,6 +10,7 @@
   "dependencies": {
     "bcryptjs": "*",
     "body-parser": "*",
+    "connect-mongo": "^1.3.2",
     "cors": "*",
     "express": "*",
     "grunt": "^1.0.1",

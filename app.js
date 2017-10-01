@@ -5,6 +5,7 @@ const cors = require('cors');
 const passport = require('passport');
 const mongoose = require('mongoose');
 const config = require('./config/database');
+//const mongoStore = require('connect-mongo')(session);
 
 // Connect to database
 mongoose.connect(config.database);
@@ -35,6 +36,14 @@ app.use(express.static(path.join(__dirname, 'public')));
 // Body parser middleware
 app.use(bodyParser.json());
 
+/*app.use(session({
+    secret: 'yoursecret',
+    resave: false,
+    saveUninitialized: false,
+    store: new mongoStore({ mongooseConnection: mongoose.connection }),
+    cookie: { maxAge: 1800*60*1000 }
+}));*/
+
 //Passport Middleware
 app.use(passport.initialize());
 app.use(passport.session());
@@ -44,7 +53,7 @@ require('./config/passport')(passport);
 app.use('/users', users);
 
 // Index route
-app.get('/', (req, res) => {
+app.use('/', (req, res) => {
     res.send('Here is Node js Backend!')
 });
 
