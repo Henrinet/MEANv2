@@ -8,14 +8,15 @@ const CommoditySchema = mongoose.Schema({
     name: { type:String, required: true },
     price: { type:Number },
     img: { type:String },
-    attributes: {
-        size: { type: String },
-        length: { type: String },
-        color: { type: String },
-        material: { type: String },
-        description: { type: String, required: true }
-    }
+    size: { type: String },
+    length: { type: String },
+    color: { type: String },
+    material: { type: String },
+    description: { type: String }
 });
 
 const Commodity = module.exports = mongoose.model('Commodity', CommoditySchema);
 
+module.exports.addCommodity = function(newCommodity, callback){
+    newCommodity.save(callback);
+};
