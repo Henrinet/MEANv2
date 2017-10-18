@@ -13,7 +13,7 @@ router.get('/add-to-cart/:id', function(req, res, next) {
         cart.add(commodity, commodity.id);
         req.session.cart = cart;
         console.log(req.session.cart);
-        res.redirect('/');
+        res.redirect('http://localhost:4200');
     });
 });
 
@@ -36,16 +36,19 @@ router.get('/remove/:id', function(req, res, next) {
 });
 
 router.get('/shopping-cart', function(req, res, next) {
+    let carts = new Cart(req.session.cart ? req.session.cart : {});
     if (!req.session.cart) {
-        return res.render('shop/shopping-cart', {commodities: null});
+        //return res.render('shop/shopping-cart', {commodities: null});
+        res.json({carts});
     }
-    var cart = new Cart(req.session.cart);
-    res.render('shop/shopping-cart', {commodities: cart.generateArray(), totalPrice: cart.totalPrice});
+    //res.render('shop/shopping-cart', {commodities: cart.generateArray(), totalPrice: cart.totalPrice});
+    res.json({carts, commodities: cart.generateArray(), totalPrice: cart.totalPrice});
+
 });
 
 router.get('/checkout', isLoggedIn, function(req, res, next) {
     if (!req.session.cart) {
-        return res.redirect('/shopping-cart');
+        return res.redirect('/carts/shopping-cart');
     }
     var cart = new Cart(req.session.cart);
     var errMsg = req.flash('error')[0];
@@ -54,7 +57,7 @@ router.get('/checkout', isLoggedIn, function(req, res, next) {
 
 router.post('/checkout', isLoggedIn, function(req, res, next) {
     if (!req.session.cart) {
-        return res.redirect('/shopping-cart');
+        return res.redirect('/carts/shopping-cart');
     }
     var cart = new Cart(req.session.cart);
 

@@ -1,18 +1,26 @@
 const express = require('express');
 const path = require('path');
+var logger = require('morgan');
+var cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
 const expressHbs = require('express-handlebars');
 const cors = require('cors');
 const passport = require('passport');
 const flash = require('connect-flash');
+var validator = require('express-validator');
 const mongoose = require('mongoose');
 const config = require('./config/database');
 const session = require('express-session');
 const MongoStore = require('connect-mongo')(session);
-const Commodity = require('./models/commodity');
+
+var routes = require('./routes/index');
+var userRoutes = require('./routes/user');
 
 // Connect to database
 mongoose.connect(config.database);
+
+//Config Passport
+require('./config/passport');
 
 //On database
 mongoose.connection.on('connected', () => {
@@ -31,9 +39,9 @@ app.engine('.hbs', expressHbs({defaultLayout: 'layout', extname: '.hbs'}));
 app.set('view engine', '.hbs');
 
 //const routes = require('./routes/index');
-const users = require('./routes/users');
-const commodities = require('./routes/commodities');
-const carts = require('./routes/carts');
+//const users = require('./routes/users');
+//const commodities = require('./routes/commodities');
+//const carts = require('./routes/carts');
 
 // Port number
 const port = 3000;
@@ -44,9 +52,13 @@ app.use(cors());
 //Set static folder
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Body parser middleware
+// uncomment after placing your favicon in /public
+//app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
+app.use(logger('dev'));
 app.use(bodyParser.json());
-
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(validator());
+app.use(cookieParser());
 app.use(session({
     secret: 'abc',
     resave: false,
@@ -63,29 +75,19 @@ app.use(flash());
 app.use(passport.initialize());
 app.use(passport.session());
 
-require('./config/passport')(passport);
+app.use(function(req, res, next) {
+    res.locals.login = req.isAuthenticated();
+    res.locals.session = req.session;
+    next();
+});
 
-//app.use((req, res, next) =>{
-//    res.locals.session = req.session;
-//});
-
-app.use('/users', users);
-app.use('/commodities', commodities);
-app.use('/carts', carts);
+//app.use('/users', users);
+//app.use('/commodities', commodities);
+//app.use('/carts', carts);
+app.use('/user', userRoutes);
 
 // Index route
-//app.use('/', routes);
-app.use('/', (req, res) => {
-    var successMsg = req.flash('success')[0];
-    Commodity.find(function (err, docs) {
-        var commodityChunks = [];
-        var chunkSize = 3;
-        for (var i = 0; i < docs.length; i += chunkSize) {
-            commodityChunks.push(docs.slice(i, i + chunkSize));
-        }
-        res.render('shop/index', {title: 'Shopping Cart', commodities: commodityChunks, successMsg: successMsg, noMessages: !successMsg});
-    });
-});
+app.use('/', routes);
 
 // all other requests redirect to 404
 /*app.get('*', (req, res) => {
