@@ -20,7 +20,7 @@ function stripeResponseHandler(status, response) {
 
         // Show the errors on the form
         $('#charge-error').text(response.error.message);
-        $('#charge-error').removeClass('hidden');
+        $('#charge-error').removeAttr('style');
         $form.find('button').prop('disabled', false); // Re-enable submission
 
     } else { // Token was created!

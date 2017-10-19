@@ -1,7 +1,12 @@
+<br>
 <div class="row">
     <div class="col-md-8 col-md-offset-2">
-        <h1>User Profile</h1>
+        <h1>User Profile</h1><br>
+        <h4>Username: {{ this.user.name }}</h4>
+        <h4>Email address: {{ this.user.email }}</h4>
+        <br>
         <hr>
+    {{# if commodities }}
         <h2>My Orders</h2>
         {{# each orders }}
             <div class="panel panel-default">
@@ -19,6 +24,6 @@
                     <strong>Total Price: ${{ this.cart.totalPrice }}</strong>
                 </div>
             </div>
-        {{/each}}
+        {{/each}}<hr>{{/if}}
     </div>
 </div>
