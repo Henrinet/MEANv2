@@ -4,32 +4,36 @@
     <h1>Checkout</h1>
 </div>
 <div class="row">
-    <div class="col-md-2 col-md-offset-4"></div>
-    <div class="form-control col-sm-6 col-md-6 col-md-offset-4 col-sm-offset-3">
-    <h4>Your Total: ${{total}}</h4>
-    <div id="charge-error" class="alert alert-danger" style="{{#if noError}}display:none{{/if}}">
+    <div class="col-md-3 col-md-offset-4"></div>
+    <div class="form-control col-sm-4 col-md-4 col-md-offset-4 col-sm-offset-3"><br>
+    <h4 class="text-center">Your Total: ${{total}}</h4>
+    <div id="charge-error" class="alert alert-danger {{#if noError}}invisible{{/if}}">
         {{errMsg}}
     </div>
-    <form action="/checkout" method="post" id="checkout-form" role="form">
-        <label for="name">Name</label>
+
+    <form action="/checkout" class="text-center" method="post" id="checkout-form" role="form">
+        <label for="name" class="pull-left">Name :</label>
         <input type="text" id="name" class="form-control" required name="name">
-        <label for="address">Address</label>
+        <label for="address" class="pull-left">Address :</label>
         <input type="text" id="address" class="form-control" required name="address">
-        <hr>
-        <label for="card-name">Card Holder Name</label>
-        <input type="text" id="card-name" class="form-control" required>
-        <label for="card-number">Credit Card Number</label>
-        <input type="text" id="card-number" class="form-control" required>
-        <label for="card-expiry-month">Expiration Month</label>
-        <input type="text" id="card-expiry-month" class="form-control" required>
-        <label for="card-expiry-year">Expiration Year</label>
-        <input type="text" id="card-expiry-year" class="form-control" required>
-        <label for="card-cvc">CVC</label>
-        <input type="text" id="card-cvc" class="form-control" required><br>
-        <button type="submit" class="btn btn-success">Buy now</button>
+        <br><hr><br>
+        <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+            <script
+                    src="https://checkout.stripe.com/checkout.js" class="stripe-button"
+                    data-key="{{ keyPublishable }}"
+                    data-amount="{{stripeTotal}}"
+                    data-name="Derby Store"
+                    data-description="Widget"
+                    data-image="https://stripe.com/img/documentation/checkout/marketplace.png"
+                    data-locale="auto"
+                    data-currency="hkd">
+
+            </script>
+        <br><br>
+        <div class="text-center">( Payment is owned by Stripe.com )</div>
     </form>
     </div>
 </div>
 
-<script type="text/javascript" src="https://js.stripe.com/v2/"></script>
+<script type="text/javascript" src="https://js.stripe.com/v3/"></script>
 <script type="text/javascript" src="javascripts/checkout.js"></script>

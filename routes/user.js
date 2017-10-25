@@ -1,11 +1,11 @@
 var express = require('express');
 var router = express.Router();
-var csrf = require('csurf');
 var passport = require('passport');
 
 var Order = require('../models/order');
 var Cart = require('../models/cart');
-
+//csrf import
+var csrf = require('csurf');
 var csrfProtection = csrf();
 router.use(csrfProtection);
 
@@ -64,7 +64,7 @@ router.post('/signin', passport.authenticate('local.signin', {
         req.session.oldUrl = null;
         res.redirect(oldUrl);
     } else {
-        res.redirect('/user/profile');
+        res.redirect('/');
     }
 });
 

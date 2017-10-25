@@ -1,13 +1,20 @@
-var express = require('express');
-var router = express.Router();
+const express = require('express');
+const router = express.Router();
 
+//csrf import
 const csrf = require('csurf');
 const csrfProtection = csrf();
 router.use(csrfProtection);
 
-var Cart = require('../models/cart');
+//Model import
+const Cart = require('../models/cart');
 const Commodity = require('../models/commodity');
-var Order = require('../models/order');
+const Order = require('../models/order');
+
+//Stripe setting
+const keyPublishable = 'pk_test_TJkK7bgCjxIwqEnYA6xXxYEV';
+const keySecret = 'sk_test_zCGgVYnMCEo5xGxxmvjXAGqA';
+const stripe = require("stripe")(keySecret);
 
 /* GET home page. */
 router.get('/', function (req, res, next) {
@@ -67,43 +74,58 @@ router.get('/checkout', isLoggedIn, function(req, res, next) {
         return res.redirect('/shopping-cart');
     }
     var cart = new Cart(req.session.cart);
+    var stripeTotal = cart.totalPrice *100;
     var errMsg = req.flash('error')[0];
-    res.render('shop/checkout', {total: cart.totalPrice, errMsg: errMsg, noError: !errMsg});
+    var fillName = req.body.name;
+    res.render('shop/checkout', {csrfToken: req.csrfToken(), total: cart.totalPrice, stripeTotal: stripeTotal, errMsg: errMsg, noError: !errMsg, keyPublishable: keyPublishable, fillName: fillName});
 });
 
 router.post('/checkout', isLoggedIn, function(req, res, next) {
+
     if (!req.session.cart) {
         return res.redirect('/shopping-cart');
     }
+    if (!req.body.name) {
+        req.flash('error', 'Please fill your name first!');
+        return res.redirect('/checkout');
+    }
+    if (!req.body.address) {
+        req.flash('error', 'Please fill your address first!');
+        return res.redirect('/checkout');
+    }
     var cart = new Cart(req.session.cart);
-    
-    var stripe = require("stripe")(
-        "sk_test_fwmVPdJfpkmwlQRedXec5IxR"
-    );
 
-    stripe.charges.create({
-        amount: cart.totalPrice * 100,
-        currency: "usd",
-        source: req.body.stripeToken, // obtained with Stripe.js
-        description: "Test Charge"
-    }, function(err, charge) {
-        if (err) {
-            req.flash('error', err.message);
-            return res.redirect('/checkout');
-        }
-        var order = new Order({
-            user: req.user,
-            cart: cart,
-            address: req.body.address,
-            name: req.body.name,
-            paymentId: charge.id
-        });
-        order.save(function(err, result) {
+    //Create a Customer:
+        stripe.customers.create({
+            email: req.body.stripeEmail,
+            source: req.body.stripeToken
+        }).then(function(customer) {
+            // YOUR CODE: Save the customer ID and other info in a database for later.
+            var order = new Order({
+                user: req.user,
+                cart: cart,
+                address: req.body.address,
+                name: req.body.name,
+                paymentId: customer.id
+            });
+            order.save((err) =>{
+                if (err) {
+                    console.log(err.message);
+                    return res.redirect('/checkout');
+                }
+            });
+            return stripe.charges.create({
+                amount: 1000,
+                currency: "hkd",
+                customer: customer.id,
+            });
+        }).then(function(charge) {
+            // Use and save the charge info.
             req.flash('success', 'Successfully bought product!');
             req.session.cart = null;
-            res.redirect('/');
-        });
-    }); 
+            return res.redirect('/');
+            });
+
 });
 
 module.exports = router;

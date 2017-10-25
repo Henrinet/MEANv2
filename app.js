@@ -1,20 +1,25 @@
 const express = require('express');
 const path = require('path');
-var logger = require('morgan');
-var cookieParser = require('cookie-parser');
+const logger = require('morgan');
+const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
 const expressHbs = require('express-handlebars');
 const cors = require('cors');
 const passport = require('passport');
 const flash = require('connect-flash');
-var validator = require('express-validator');
+const validator = require('express-validator');
 const mongoose = require('mongoose');
 const config = require('./config/database');
 const session = require('express-session');
 const MongoStore = require('connect-mongo')(session);
 
-var routes = require('./routes/index');
-var userRoutes = require('./routes/user');
+const routes = require('./routes/index');
+const userRoutes = require('./routes/user');
+
+//Stripe setting
+const keyPublishable = process.env.PUBLISHABLE_KEY;
+const keySecret = process.env.SECRET_KEY;
+const stripe = require("stripe")(keySecret);
 
 // Connect to database
 mongoose.connect(config.database);
@@ -37,11 +42,6 @@ const app = express();
 // view engine setup
 app.engine('.hbs', expressHbs({defaultLayout: 'layout', extname: '.hbs'}));
 app.set('view engine', '.hbs');
-
-//const routes = require('./routes/index');
-//const users = require('./routes/users');
-//const commodities = require('./routes/commodities');
-//const carts = require('./routes/carts');
 
 // Port number
 const port = 3000;
@@ -92,6 +92,15 @@ app.use('/', routes);
 // all other requests redirect to 404
 /*app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, 'public/index.html'))
+});
+app.use(function (req,res,next) {
+    console.log("app.usr local");
+    res.locals.user = req.session.user;
+    var err = req.flash('error');
+    res.locals.error = err.length ? err: null;
+    var success = req.flash('success');
+    res.locals.success = success.length ? success : null;
+    next();
 });*/
 
 // Start server

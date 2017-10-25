@@ -6,24 +6,23 @@
         <h4>Email address: {{ this.user.email }}</h4>
         <br>
         <hr>
-    {{# if commodities }}
+    {{# if orders }}
         <h2>My Orders</h2>
         {{# each orders }}
-            <div class="panel panel-default">
-                <div class="panel-body">
+            <div class="card">
+                <div class="card-body">
                     <ul class="list-group">
                         {{# each this.items }}
                             <li class="list-group-item">
-                                <span class="badge">{{ this.price }}</span>
-                                {{ this.item.title }} | {{ this.qty }} Units
+                                {{ this.item.name }} <span class="badge badge-pill badge-info">$ {{ this.price }}</span> x {{ this.qty }}
                             </li>
                         {{/each}}
                     </ul>
                 </div>
-                <div class="panel-footer">
+                <div class="card-footer">
                     <strong>Total Price: ${{ this.cart.totalPrice }}</strong>
                 </div>
-            </div>
-        {{/each}}<hr>{{/if}}
+            </div><hr>
+        {{/each}}{{/if}}
     </div>
 </div>

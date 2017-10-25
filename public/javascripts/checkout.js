@@ -1,9 +1,17 @@
-Stripe.setPublishableKey('pk_test_m6ZWLYyvkUAqJzr1fvr1uRj2');
+//Stripe setting
 
 var $form = $('#checkout-form');
 
-$form.submit(function (event) {
-    $('#charge-error').addClass('hidden');
+$form.submit(function () {
+    name: $('#name').val()
+    if (name === ""){
+        console.log('fuck');
+    }
+    return false;
+});
+
+/*$form.submit(function (event) {
+    $('#charge-error').addClass('invisible');
     $form.find('button').prop('disabled', true);
     Stripe.card.createToken({
         number: $('#card-number').val(),
@@ -20,7 +28,7 @@ function stripeResponseHandler(status, response) {
 
         // Show the errors on the form
         $('#charge-error').text(response.error.message);
-        $('#charge-error').removeAttr('style');
+        $('#charge-error').removeClass('invisible');
         $form.find('button').prop('disabled', false); // Re-enable submission
 
     } else { // Token was created!
@@ -35,4 +43,4 @@ function stripeResponseHandler(status, response) {
         $form.get(0).submit();
 
     }
-}
+}*/
