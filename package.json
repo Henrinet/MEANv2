@@ -41,6 +41,6 @@
   "author": "Henry Kan",
   "license": "ISC",
   "devDependencies": {
-    "mongoose": "^4.11.11"
+    "mongoose": "^5.7.11"
   }
 }
